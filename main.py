@@ -4,10 +4,11 @@ import time
 import threading
 import ctypes
 import keyboard
+import logging
 
-INACTIVITY_THRESHOLD = 540 
-COUNTDOWN_THRESHOLD = 60  
-MAX_SHUTDOWN_RETRIES = 3  
+INACTIVITY_THRESHOLD = 540
+COUNTDOWN_THRESHOLD = 60
+MAX_SHUTDOWN_RETRIES = 3
 
 def display_shutdown_warning(message):
     ctypes.windll.user32.MessageBoxW(0, message, "PC Shutdown Warning", 0x40 | 0x1)
@@ -40,16 +41,25 @@ def check_activity():
 def initiate_shutdown(retries=0):
     try:
         subprocess.call(['shutdown', '/s', '/f', '/t', '0'], shell=True)
-    except subprocess.CalledProcessError:
-        print("An error occurred while trying to shut down the PC.")
+    except subprocess.CalledProcessError as e:
+        logging.error("An error occurred while trying to shut down the PC: %s", str(e))
 
         if retries < MAX_SHUTDOWN_RETRIES:
-            print("Retrying shutdown...")
+            logging.info("Retrying shutdown...")
             initiate_shutdown(retries + 1)
         else:
-            print("Max shutdown retries exceeded. Unable to shut down.")
+            logging.error("Max shutdown retries exceeded. Unable to shut down.")
+
+            subprocess.call(['shutdown', '/g'], shell=True)
 
 try:
+    logging.basicConfig(
+        level=logging.ERROR,
+        filename="error.log",
+        filemode="w",
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
     while True:
         check_activity()
 except KeyboardInterrupt:
