@@ -1,4 +1,4 @@
-# Shutdown.py
+# SmartSleep
 
 Shutdown.py is an automated PC shutdown program that monitors user activity and initiates a system shutdown when no movement or keyboard activity is detected for a specified period of time. It helps ensure energy efficiency and provides an additional layer of security for your PC.
 
